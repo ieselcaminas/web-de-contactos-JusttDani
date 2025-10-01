@@ -1,0 +1,13 @@
+{% extends 'base.html.twig'%}
+{% block title %}Datos del contacto{% endblock %}
+{% block body %}
+<ul>
+
+    <li><strong>{{ contacto.nombre }}</strong></li>
+
+    <li><strong>Teléfono</strong>: {{ contacto.telefono }}</li>
+
+    <li><strong>E-mail</strong>: {{ contacto.email }}</li>
+
+</ul>
+{% endblock %}
