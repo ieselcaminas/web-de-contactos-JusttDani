@@ -15,7 +15,7 @@ final class PageController extends AbstractController
 
 {
 
-    private $contactos = [
+    protected $contactos = [
 
         1 => ["nombre" => "Juan Pérez", "telefono" => "524142432", "email" => "juanp@ieselcaminas.org"],
 
