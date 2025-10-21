@@ -52,7 +52,8 @@ security:
 
             logout:
 
-                path: app_logout
+                path: logout
+                target: login
 
             # activate different ways to authenticate
 
