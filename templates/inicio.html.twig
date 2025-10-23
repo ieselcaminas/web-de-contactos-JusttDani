@@ -1,7 +1,56 @@
 {% extends 'base.html.twig' %}
-{% block tittle %}Contactos{% endblock %}
+
+{% block title %}Contactos{% endblock %}
+
 {% block body %}
-	<h1>Contactos</h1>
-	<h2>Bienvenido a la web de contactos.</h2>
-	<p>Página de inicio</p>
+<div class="container mt-4">
+    <h1 class="mb-3">Contactos</h1>
+    <h2 class="mb-4">Bienvenido a la web de contactos</h2>
+    <p>Lista de usuarios</p>
+
+    {% if contactos|length > 0 %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Email</th>
+                    <th>Nombre</th>
+                    <th>Teléfono</th>
+                    <th>Provincia</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contacto in contactos %}
+                    <tr>
+                        <td>
+                            <a href="http://127.0.0.1:8080/contacto/{{contacto.id}}">
+                                {{ contacto.email }}
+                            </a>
+                        </td>
+                        <td>{{ contacto.nombre }}</td>
+                        <td>{{ contacto.telefono }}</td>
+                        <td>{{ contacto.provincia }}</td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a href=" http://127.0.0.1:8080/contacto/editar/{{contacto.id}}" class="btn btn-sm btn-primary">
+                                    Editar
+                                </a>
+                                <a href="http://127.0.0.1:8080/contacto/delete/{{contacto.id}}" class="btn btn-sm btn-danger"
+                                   onclick="return confirm('¿Estás seguro de que deseas eliminar este contacto?');">
+                                    Eliminar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <div class="alert alert-info mt-3">
+            No hay usuarios registrados.
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

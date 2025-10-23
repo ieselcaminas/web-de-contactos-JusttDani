@@ -161,64 +161,41 @@ public function nuevo(ManagerRegistry $doctrine, Request $request) {
 #[Route('/contacto/editar/{codigo}', name: 'editar', requirements:["codigo"=>"\d+"])]
 
 public function editar(ManagerRegistry $doctrine, Request $request, int $codigo) {
-
     $repositorio = $doctrine->getRepository(Contacto::class);
-
     $contacto = $repositorio->find($codigo);
-
+    
     if ($contacto){
-
         $formulario = $this->createForm(ContactoType::class, $contacto);
-
-
-
         $formulario->handleRequest($request);
-
-
-
+        
         if ($formulario->isSubmitted() && $formulario->isValid()) {
-
-
             $contacto = $formulario->getData();
-
             $entityManager = $doctrine->getManager();
-
             $entityManager->persist($contacto);
-
             $entityManager->flush();
-
             return $this->redirectToRoute('ficha_contacto', ["codigo" => $contacto->getId()]);
-
         }
-
         return $this->render('nuevo.html.twig', array(
 
             'formulario' => $formulario->createView()
-
         ));
-
     }else{
-
         return $this->render('ficha_contacto.html.twig', [
-
             'contacto' => NULL
-
         ]);
-
     }
-
 }
 
 
     
 
-    #[Route('/contacto/{nombre}', name: 'ficha_contacto')]
+    #[Route('/contacto/{codigo}', name: 'ficha_contacto')]
 
-    public function ficha(ManagerRegistry $doctrine, $nombre): Response{
+    public function ficha(ManagerRegistry $doctrine, $codigo): Response{
         $repositorio = $doctrine->getRepository(Contacto::class);
 
         //Si no existe el elemento con dicha clave devolvemos null
-        $contacto = $repositorio->find($nombre);
+        $contacto = $repositorio->find($codigo);
 
         return $this->render('ficha_contacto.html.twig', [
         'contacto' => $contacto
@@ -236,45 +213,47 @@ public function editar(ManagerRegistry $doctrine, Request $request, int $codigo)
         ]);
     }
 
-    #[Route('/contacto/update/{telefono}/{nombre}', name: 'modificar_contacto')]
-    public function update(ManagerRegistry $doctrine,$telefono, $nombre): Response{
-        $entityManager = $doctrine->getManager();
-        $repositorio = $doctrine->getRepository(Contacto::class);
-        $contacto = $repositorio->find($nombre);
-        if ($contacto){
-            $contacto->setTelefono($telefono);
-            try {
-                $entityManager->flush();
-                return $this->render('ficha_contacto.html.twig', [
-                    'contacto' => $contacto
-                ]);
-            } catch (\Exception $e) {
-                return new Response('Error al modificar el contacto: ' . $e->getMessage());
-            }   
-        } else 
+    #[Route('/contacto/update/{codigo}/{telefono}', name: 'modificar_contacto', requirements: ["codigo" => "\d+"])]
+public function update(ManagerRegistry $doctrine, int $codigo, string $telefono): Response{
+    $entityManager = $doctrine->getManager();
+    $repositorio = $doctrine->getRepository(Contacto::class);
+    $contacto = $repositorio->find($codigo); // ✅ Ahora usa código/ID
+    
+    if ($contacto){
+        $contacto->setTelefono($telefono);
+        try {
+            $entityManager->flush();
             return $this->render('ficha_contacto.html.twig', [
-                'contacto' => null
+                'contacto' => $contacto
             ]);
+        } catch (\Exception $e) {
+            return new Response('Error al modificar el contacto: ' . $e->getMessage());
+        }   
     }
+    return $this->render('ficha_contacto.html.twig', [
+        'contacto' => null
+    ]);
+}
 
-    #[Route('/contacto/delete/{nombre}', name: 'modificar_contacto')]
-    public function delete(ManagerRegistry $doctrine,$nombre): Response{
-        $entityManager = $doctrine->getManager();
-        $repositorio = $doctrine->getRepository(Contacto::class);
-        $contacto = $repositorio->find($nombre);
-        if ($contacto){
-            try {
-                $entityManager->remove($contacto);
-                $entityManager->flush();
-                return new Response("Contacto eliminado correctamente");
-            } catch (\Exception $e) {
-                return new Response("Error al eliminar.");
-            }   
-        } else 
-            return $this->render('ficha_contacto.html.twig', [
-                'contacto' => null
-            ]);
+#[Route('/contacto/delete/{codigo}', name: 'eliminar_contacto', requirements: ["codigo" => "\d+"])]
+public function delete(ManagerRegistry $doctrine, int $codigo): Response{
+    $entityManager = $doctrine->getManager();
+    $repositorio = $doctrine->getRepository(Contacto::class);
+    $contacto = $repositorio->find($codigo);
+    
+    if ($contacto){
+        try {
+            $entityManager->remove($contacto);
+            $entityManager->flush();
+            return $this->redirectToRoute('inicio');
+        } catch (\Exception $e) {
+            return new Response("Error al eliminar.");
+        }   
     }
+    return $this->render('ficha_contacto.html.twig', [
+        'contacto' => null
+    ]);
+}
 
 
     
